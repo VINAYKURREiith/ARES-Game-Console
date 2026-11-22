@@ -1,530 +1,355 @@
-🎮 ARES Game Console
 
-A DIY handheld retro gaming console built around the Raspberry Pi
-Pico 2 and an SSD1306 OLED display, designed as a compact
-embedded-systems project combining hardware, MicroPython, graphics,
-input handling, game logic, and audio.
+# 🎮 ARES – Pocket Arcade
 
-The project is developed as a practical embedded gaming platform rather
-than just a single game. It provides a menu-driven interface from which
-multiple retro-style games can be launched.
+### A Custom Retro Gaming Console Powered by Raspberry Pi Pico 2
 
-Repository:
-ARES-Game-Console
+ARES Pocket Arcade is a compact, standalone retro gaming console built around the **Raspberry Pi Pico 2 (RP2350)**. It brings classic arcade-style games to an embedded platform through custom graphics rendering, real-time input handling, game-state management, and hardware-level display interfacing.
 
-📸 Project Photos
+The project explores embedded systems, low-level hardware programming, graphics rendering, game-loop design, and performance optimization on a resource-constrained microcontroller.
 
-Boot Screen
+---
 
-The console starts with a custom ARES/Pico 2 boot screen displayed on
-the OLED.
+## 📸 Project Overview
 
+ARES is designed as a self-contained gaming platform with:
 
+- A custom boot interface and game-selection menu.
+- A 2.8-inch colour TFT display.
+- Eight-button game controls.
+- Multiple retro-style games.
+- Framebuffer-based graphics rendering.
+- Score and game-state management.
+- Buzzer-based sound effects.
+- USB-powered operation.
 
-Game Selection Interface
+The console runs its firmware directly on the Raspberry Pi Pico 2 without requiring a PC during gameplay.
 
-The OLED provides a menu-based interface for selecting and launching
-games.
+---
 
+## ✨ Key Features
 
+- **Custom Embedded Console:** Built using the Raspberry Pi Pico 2 (RP2350).
+- **Colour TFT Interface:** 320 × 240 display resolution in landscape orientation.
+- **Multiple Games:** Eight arcade-style games integrated into one console.
+- **Custom Graphics Engine:** Framebuffer-based rendering for game graphics.
+- **Input Management:** Eight physical buttons mapped to GPIO pins.
+- **Game State Management:** Menu navigation, gameplay, scoring, and game-over handling.
+- **Audio Feedback:** Buzzer-based sound effects using PWM.
+- **Performance Monitoring:** Frame-rate measurement and display performance analysis.
+- **Standalone Operation:** Firmware executes directly from the Pico 2.
+
+---
+
+## 🕹️ Games Included
+
+| No. | Game | Description |
+|---|---|---|
+| 1 | 2048 | Number-merging puzzle game |
+| 2 | Pong | Classic two-paddle arcade game |
+| 3 | Sky Invaders | Space-shooter inspired by Space Invaders |
+| 4 | Breakout | Paddle-controlled brick-breaking game |
+| 5 | Tetris | Falling-block puzzle game |
+| 6 | Snake | Classic snake movement and food collection |
+| 7 | Racing | Arcade-style racing game |
+| 8 | Sokoban | Grid-based box-pushing puzzle |
+
+Each game uses the common console interface and input hardware while maintaining its own gameplay logic.
+
+---
+
+## 🔧 Hardware Components
+
+| Component | Specification / Purpose |
+|---|---|
+| Microcontroller | Raspberry Pi Pico 2 |
+| MCU Architecture | RP2350 |
+| Display | Waveshare 2.8-inch TFT |
+| Display Resolution | 320 × 240 pixels |
+| Display Interface | SPI |
+| Display Controller | HX8347D |
+| Input Interface | 8 push buttons |
+| Audio | PWM buzzer |
+| Power Supply | USB 5 V |
+| Development Interface | USB |
+
+### Display
+
+The console uses a Waveshare 2.8-inch TFT display with a 320 × 240 resolution.
+
+The display provides a colour graphical interface for:
+
+- Boot screen and main menu.
+- Game graphics and animations.
+- Player movement and game objects.
+- Score and status information.
+- Game-over and menu screens.
+
+### Button Configuration
+
+The physical controls are connected to the Pico 2 GPIO pins.
+
+| Button | GPIO |
+|---|---|
+| UP | GP2 |
+| DOWN | GP3 |
+| LEFT | GP4 |
+| RIGHT | GP5 |
+| A | GP6 |
+| B | GP7 |
+| X | GP8 |
+| Y | GP9 |
+
+The buttons provide directional movement, selection, gameplay actions, and navigation.
+
+### Audio
+
+A PWM-controlled buzzer connected to GP15 provides basic sound feedback during gameplay.
+
+---
+
+## 🧠 System Architecture
+
+The console follows a modular embedded software architecture.
 
-✨ Project Highlights
+```text
+             Raspberry Pi Pico 2
+                  (RP2350)
+                      |
+          +-----------+-----------+
+          |           |           |
+          v           v           v
+      TFT Display  8 Buttons    Buzzer
+          |           |           |
+          +-----------+-----------+
+                      |
+                      v
+              ARES Game Engine
+                      |
+          +-----------+-----------+
+          |           |           |
+          v           v           v
+       Main Menu   Input System  Audio
+          |
+          v
+      Game Selection
+          |
+    +-----+-----+-----+-----+
+    |     |     |     |     |
+   2048  Pong  Tetris Snake ...
+    |
+    v
+  Game Logic
+    |
+    v
+ Graphics / Framebuffer
+    |
+    v
+  TFT Display Output
+```
 
-🎮 Handheld-style retro gaming system
+### Software Modules
 
-🧠 Raspberry Pi Pico 2 based controller
+The architecture separates the major responsibilities:
 
-🖥️ 0.96-inch SSD1306 OLED display
+- **Display Driver:** Handles TFT initialization and display communication.
+- **Graphics Engine:** Manages drawing operations and framebuffer rendering.
+- **Input Manager:** Reads and processes physical button inputs.
+- **Game Manager:** Handles game selection and transitions.
+- **Game Modules:** Implement individual game logic and mechanics.
+- **Audio Module:** Generates buzzer-based sound effects.
+- **System Manager:** Coordinates the overall console operation.
 
-🎛️ Six-button game control interface
+---
 
-🕹️ Menu-driven game selection
+## 💻 Software and Development Tools
 
-🎨 Custom boot animation and user interface
+| Technology | Application |
+|---|---|
+| C / C++ | Embedded firmware development |
+| Raspberry Pi Pico SDK | Hardware and peripheral programming |
+| CMake | Build configuration |
+| Ninja | Build automation |
+| PIO | Programmable I/O support where used |
+| SPI | TFT display communication |
+| GPIO | Button input handling |
+| PWM | Buzzer sound generation |
+| DMA | Hardware transfer optimization where implemented |
+| VS Code | Development environment |
 
-💾 Game/high-score management architecture
+The firmware is compiled into a UF2 binary that can be flashed onto the Raspberry Pi Pico 2.
 
-🔊 Audio/music support
+---
 
-⚡ USB-powered embedded platform
+## 🎨 Graphics and Rendering
 
-🐍 MicroPython-based software
+The console uses a framebuffer-oriented graphics approach.
 
-📦 Modular game architecture
+A framebuffer stores pixel information before it is transferred to the display.
 
-🧰 Hardware
+For a 320 × 240 display using RGB565 colour representation:
 
-Component                           Description
+\[
+320 \times 240 \times 2 = 153600 \text{ bytes}
+\]
 
-Raspberry Pi Pico 2             Main microcontroller and
-game-processing platform
+This corresponds to approximately 150 KiB of pixel data for one full frame.
 
-SSD1306 0.96" OLED              128×64 graphical display
+The graphics system supports:
 
-6 Push Buttons                  User input and game controls
+- Pixel and shape drawing.
+- Game-object rendering.
+- Text and score rendering.
+- Screen updates.
+- Game-specific graphical layouts.
 
-Breadboard                      Hardware prototyping
+---
 
-USB Cable                       Power and programming
+## ⚡ Performance Evaluation
 
-Audio Hardware                  Audio output for game sounds/music
+The console's rendering performance can be evaluated using frames per second (FPS).
 
-OLED Interface
+FPS represents the number of frames rendered per second.
 
-The SSD1306 OLED is connected through I²C.
+\[
+FPS = \frac{\text{Number of Frames}}{\text{Elapsed Time}}
+\]
 
-Typical interface signals:
+During project testing, a frame rate of approximately **19.53 FPS** was observed.
 
-Pico 2                 SSD1306
-──────────────────────────────
-3.3V       ───────────► VCC
-GND        ───────────► GND
-SDA        ───────────► SDA
-SCL        ───────────► SCL
+At 320 × 240 resolution with RGB565:
 
-The display is used for:
+\[
+\text{Frame Size} = 150 \text{ KiB}
+\]
 
-Boot animation
+The corresponding theoretical full-frame pixel-data rate at 19.53 FPS is approximately:
 
-Main menu
+\[
+150 \times 19.53 = 2929.5 \text{ KiB/s}
+\]
 
-Game selection
+Actual display-interface traffic and rendering performance depend on the update strategy and implementation.
 
-Game graphics
+---
 
-Scores
+## 🚀 Getting Started
 
-High scores
+### 1. Requirements
 
-Game status information
+Install the following development tools:
 
-🎛️ Button Mapping
+- Raspberry Pi Pico SDK
+- ARM GNU Toolchain
+- CMake
+- Ninja
+- Git
+- Visual Studio Code (recommended)
 
-The current six-button configuration uses:
+### 2. Clone the Repository
 
-Button     GPIO Function
-
-UP          GP2 Menu navigation / game-specific action
-DOWN        GP3 Menu navigation / game-specific action
-LEFT        GP4 Move left
-RIGHT       GP5 Move right
-A           GP6 Primary action
-B           GP7 Secondary action / Back
-
-The exact function of A/B/UP/DOWN can be assigned differently for
-individual games.
-
-💻 Software Stack
-
-The software is written primarily in MicroPython for the Raspberry
-Pi Pico 2.
-
-Technologies
-
-MicroPython
-
-Python
-
-Raspberry Pi Pico 2
-
-SSD1306 OLED driver
-
-I²C communication
-
-GPIO input handling
-
-PWM/audio where required
-
-Frame-based graphics rendering
-
-Game-state management
-
-MicroPython is designed for microcontrollers and constrained embedded
-systems, making it suitable for this type of Pico-based application.
-
-🕹️ Game Architecture
-
-The console is organized around a main menu and separate game modules.
-
-Conceptually:
-
-                    ┌─────────────────┐
-                    │    BOOT         │
-                    │   ANIMATION     │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │   MAIN MENU     │
-                    └────────┬────────┘
-                             │
-          ┌──────────────────┼──────────────────┐
-          │                  │                  │
-          ▼                  ▼                  ▼
-       Pong               Snake           Space Invaders
-          │                  │                  │
-          └──────────────────┼──────────────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │   GAME STATE    │
-                    │ SCORE / PAUSE   │
-                    │ HIGH SCORE      │
-                    └─────────────────┘
-
-This modular approach allows individual games to be developed and tested
-independently while sharing common hardware and UI components.
-
-🎮 Game Features
-
-The project is designed to support several retro-style games, including:
-
-Pong
-
-Snake
-
-Space Invaders
-
-Dino
-
-2048
-
-Tetris
-
-Full Speed
-
-Lunar Module
-
-The game architecture can be extended with additional games without
-redesigning the complete hardware platform.
-
-🖥️ User Interface
-
-The UI is designed around the limitations of a 128×64 monochrome
-OLED.
-
-The interface includes:
-
-Boot Animation
-
-A custom startup animation provides an arcade-style boot experience.
-
-Main Menu
-
-Games are presented through a scrollable menu controlled using the
-UP/DOWN buttons.
-
-Game State
-
-The software architecture supports concepts such as:
-
-GAME
-LEVEL
-CURRENT SCORE
-HIGH SCORE
-GAME STATE
-
-This provides a foundation for implementing:
-
-New Game
-
-Resume
-
-Level Selection
-
-High Scores
-
-Pause
-
-Game Over
-
-Menu Navigation
-
-🏆 Score & High-Score System
-
-The console is designed to maintain game scores and high scores.
-
-A typical game state can be represented as:
-
-GAME STATE
-│
-├── Current Score
-├── High Score
-├── Level
-├── Playing
-├── Paused
-└── Game Over
-
-Future versions can persist high scores in Pico flash or another
-non-volatile storage mechanism.
-
-🔊 Audio
-
-Audio is included as part of the arcade experience.
-
-The design can support:
-
-Game sound effects
-
-Background music
-
-Startup sound
-
-Menu sounds
-
-Game-specific music
-
-For higher-quality audio output, an external I²S amplifier such as the
-MAX98357A can be used with a suitable speaker.
-
-⚙️ Power Management
-
-The console is designed for USB-powered operation and can be extended
-with battery power.
-
-A power-saving architecture can include:
-
-User Activity
-     │
-     ▼
-Reset inactivity timer
-     │
-     ▼
-No input for configured period
-     │
-     ▼
-Power-saving / sleep mode
-     │
-     ▼
-Button activity
-     │
-     ▼
-Resume
-
-This is particularly useful when the console is converted into a
-standalone battery-powered handheld device.
-
-📁 Repository Structure
-
-The repository contains the MicroPython implementation and project
-documentation.
-
-A typical structure is:
-
-ARES-Game-Console/
-│
-├── micropython/
-│   ├── main.py
-│   ├── boot_animation.py
-│   ├── PicoGame.py
-│   ├── PicoPong.py
-│   ├── PicoSnake.py
-│   ├── PicoSpaceInvaders.py
-│   ├── PicoDino.py
-│   ├── Pico2048.py
-│   ├── PicoTetris.py
-│   └── ...
-│
-├── images/
-│
-└── README.md
-
-The exact filenames may evolve as the project is developed.
-
-🚀 Getting Started
-
-1. Clone the repository
-
+```bash
 git clone https://github.com/VINAYKURREiith/ARES-Game-Console.git
+
 cd ARES-Game-Console
+```
 
-2. Install MicroPython on the Pico 2
+### 3. Configure the Pico SDK
 
-Flash the appropriate MicroPython firmware for the Raspberry Pi Pico 2.
+Set the Pico SDK environment variable.
 
-3. Connect the Hardware
+Windows PowerShell:
 
-Connect:
+```powershell
+$env:PICO_SDK_PATH = "C:\path\to\pico-sdk"
+```
 
-SSD1306 OLED through I²C
+Use the location where the SDK is installed on your system.
 
-Six buttons to the configured GPIO pins
+### 4. Build the Firmware
 
-Audio hardware if required
+From the project root, configure and build using CMake and Ninja:
 
-USB to the Pico 2
+```bash
+cmake -S . -B build -G Ninja
+cmake --build build
+```
 
-4. Upload the MicroPython Files
+The exact build commands may need adjustment if the project uses a different CMake configuration or build directory.
 
-Upload the required .py files to the Pico 2 filesystem.
+### 5. Flash the Pico 2
 
-The main entry point should be:
+1. Disconnect the Raspberry Pi Pico 2 from USB.
+2. Hold the BOOTSEL button.
+3. Connect the Pico 2 to the computer.
+4. Release BOOTSEL when the `RPI-RP2` drive appears.
+5. Copy the generated `.uf2` firmware file to the drive.
 
-main.py
+The Pico 2 will reboot and execute the ARES firmware.
 
-5. Run the Console
+---
 
-After rebooting the Pico 2:
+## 🧪 Testing and Validation
 
-BOOT ANIMATION
-      ↓
-MAIN MENU
-      ↓
-SELECT GAME
-      ↓
-PLAY
+The project involves hardware and software validation, including:
 
-🧪 Development & Debugging
+- TFT initialization and communication testing.
+- Display orientation and colour testing.
+- GPIO button-input testing.
+- Game functionality and state-transition testing.
+- Buzzer output testing.
+- Frame-rate measurement.
+- Firmware compilation and flashing.
+- Runtime debugging through USB.
 
-During development, the Pico can be connected to a computer through USB
-for:
+---
 
-Code upload
+## 📚 Learning Outcomes
 
-Serial debugging
+This project provides practical experience in:
 
-Runtime error monitoring
+- Embedded C/C++ programming.
+- Raspberry Pi Pico 2 and RP2350 architecture.
+- Hardware peripheral interfacing.
+- SPI communication.
+- GPIO and PWM programming.
+- Framebuffer-based graphics.
+- Display-driver development.
+- Game-loop implementation.
+- Real-time input processing.
+- Memory allocation and optimization.
+- Embedded firmware development.
+- CMake-based build systems.
 
-Testing individual games
+---
 
-Testing OLED communication
+## 🔮 Possible Future Improvements
 
-Testing button inputs
+- Rechargeable battery-powered operation.
+- Custom PCB and enclosure design.
+- Persistent high-score storage.
+- Wi-Fi-based multiplayer.
+- Additional arcade games.
+- Improved graphics and animation performance.
+- Enhanced audio output.
+- Further display-transfer optimization.
 
-For MicroPython development, tools such as mpremote can also be used
-to interact with the device and transfer/run scripts over the serial
-connection. citeturn2search8
+---
 
-🔌 System Block Diagram
+## 👨‍💻 Author
 
-                       ┌──────────────────┐
-                       │   Raspberry Pi   │
-                       │      Pico 2      │
-                       └────────┬─────────┘
-                                │
-              ┌─────────────────┼─────────────────┐
-              │                 │                 │
-              ▼                 ▼                 ▼
-       ┌────────────┐    ┌────────────┐    ┌────────────┐
-       │ SSD1306    │    │ 6 Buttons  │    │   Audio    │
-       │ OLED       │    │ GP2 - GP7  │    │  Output    │
-       └────────────┘    └────────────┘    └────────────┘
-              │                 │                 │
-              └─────────────────┼─────────────────┘
-                                │
-                                ▼
-                       ┌─────────────────┐
-                       │  Game Engine    │
-                       │                 │
-                       │ Menu / Input    │
-                       │ Graphics        │
-                       │ Physics         │
-                       │ Score           │
-                       │ Game State      │
-                       └─────────────────┘
+**Vinay Kurre**
 
-🎯 Learning Objectives
-
-This project provides hands-on experience with:
-
-Embedded systems
-
-Raspberry Pi Pico 2
-
-MicroPython
-
-GPIO programming
-
-I²C communication
-
-OLED graphics
-
-Game-loop design
-
-Input handling
-
-Framebuffer rendering
-
-State machines
-
-Game physics
-
-Score management
-
-Audio generation
-
-Power management
-
-Modular software architecture
-
-🔮 Future Improvements
-
-Planned or possible extensions include:
-
-🔋 Rechargeable battery system
-
-📦 Custom 3D-printed enclosure
-
-📡 Wi-Fi multiplayer
-
-🎵 Per-game background music
-
-🔊 Improved audio system
-
-💾 Persistent save/high-score storage
-
-⚡ DMA-based display updates
-
-💤 Automatic power-saving mode
-
-🎮 More games
-
-🖥️ Larger color display
-
-🕹️ Improved game controller layout
-
-🧵 FreeRTOS-based implementation
-
-🌐 Multiplayer networking
-
-📌 Project Status
-
-Current stage: Functional prototype
-
-The prototype demonstrates:
-
-Raspberry Pi Pico 2 operation
-
-SSD1306 OLED graphics
-
-Custom boot screen
-
-Game-selection interface
-
-Button-based navigation
-
-Modular retro-game architecture
-
-The project can be further developed into a compact standalone handheld
-console.
-
-👨‍💻 Author
-
-Vinay Kurre
-
-B.Tech --- Electrical Engineering
+B.Tech – Electrical Engineering  
 Indian Institute of Technology Hyderabad
 
-GitHub: VINAYKURREiith
+- GitHub: [VINAYKURREiith](https://github.com/VINAYKURREiith)
+- Project: [ARES Game Console](https://github.com/VINAYKURREiith/ARES-Game-Console)
+- LinkedIn: [Vinay Kurre](https://www.linkedin.com/in/vinay-kurre-44bba52a8/)
 
-⭐ Repository
+---
 
-ARES-Game-Console
+## ⭐ Support
 
-If you find the project interesting, consider giving the repository a
-⭐.
+If you find this project interesting, consider starring the repository!
 
-📄 License
-
-This project is intended for educational, experimental, and personal
-embedded-systems development.
+Built with curiosity, embedded systems, and a love for retro gaming. 🎮
