@@ -1,0 +1,14 @@
+#include "breakout.hpp"
+#include "../../core/common.hpp"
+#include "../../audio/audio.hpp"
+#include <stdlib.h>
+#include <math.h>
+static const int COLS=8,MAX_ROWS=7; static int rows=4; static bool bricks[MAX_ROWS][COLS]; static int paddle,score,lives; static float bx,by,vx,vy; static bool over, won; static uint32_t tick;
+static void serve(){bx=SCREEN_W/2.0f;by=SCREEN_H-48.0f;float speed=2.4f+(game_level-1)*0.008f;if(speed>4.8f)speed=4.8f;vx=(rand()%2?speed*0.85f:-speed*0.85f);vy=-speed;tick=to_ms_since_boot(get_absolute_time());}
+void breakout_init(){rows=4+(game_level-1)/50;if(rows>MAX_ROWS)rows=MAX_ROWS;for(int y=0;y<MAX_ROWS;y++)for(int x=0;x<COLS;x++)bricks[y][x]=(y<rows);paddle=SCREEN_W/2-22;score=0;lives=3;over=false;won=false;serve();}
+void breakout_update(bool up,bool down,bool left,bool right,bool a){(void)up;(void)down;(void)a;if(over)return;if(left)paddle-=4;if(right)paddle+=4;if(paddle<6)paddle=6;if(paddle>SCREEN_W-50)paddle=SCREEN_W-50;uint32_t now=to_ms_since_boot(get_absolute_time());if(now-tick<16)return;tick=now;bx+=vx;by+=vy;
+if(bx<5){bx=5;vx=fabsf(vx);audio_play_sfx(SFX_WALL_HIT);}if(bx>SCREEN_W-11){bx=SCREEN_W-11;vx=-fabsf(vx);audio_play_sfx(SFX_WALL_HIT);}if(by<38){by=38;vy=fabsf(vy);audio_play_sfx(SFX_WALL_HIT);}
+int bw=(SCREEN_W-20)/COLS,bh=12,ox=10,oy=46;int cx=((int)bx-ox)/bw,cy=((int)by-oy)/bh;if(cx>=0&&cx<COLS&&cy>=0&&cy<rows&&bricks[cy][cx]&&by>=oy&&by<oy+rows*bh){bricks[cy][cx]=false;score+=1;vy=-vy;audio_play_sfx(SFX_BRICK_BREAK);bool any=false;for(int y=0;y<rows;y++)for(int x=0;x<COLS;x++)any|=bricks[y][x];if(!any){won=true;over=true;score+=50;audio_play_sfx(SFX_VICTORY);}}
+int py=SCREEN_H-28;if(vy>0&&by+7>=py&&by+7<=py+8&&bx+7>=paddle&&bx<=paddle+44){by=py-8;vy=-fabsf(vy);float hit=(bx+3.5f)-(paddle+22);vx=hit/12.0f;if(vx>3)vx=3;if(vx< -3)vx=-3;audio_play_sfx(SFX_PADDLE_HIT);}if(by>SCREEN_H-14){lives--;audio_play_sfx(SFX_LIFE_LOST);if(lives<=0){over=true;audio_play_sfx(SFX_GAME_OVER);}else serve();}}
+void breakout_draw(){clear_screen(C_BLACK);draw_text(10,7,"BREAKOUT",C_CYAN,2);draw_text(175,10,"SCORE",C_WHITE,1);draw_number(215,10,score,C_YELLOW,1);draw_text(85,28,"LV",C_CYAN,1);draw_number(104,28,game_level,C_YELLOW,1);draw_text(10,28,"LIVES",C_WHITE,1);draw_number(48,28,lives,C_GREEN,1);border_rect(5,38,SCREEN_W-10,SCREEN_H-52,C_CYAN);int bw=(SCREEN_W-20)/COLS;uint16_t cs[4]={C_RED,C_ORANGE,C_YELLOW,C_GREEN};for(int y=0;y<rows;y++)for(int x=0;x<COLS;x++)if(bricks[y][x])rect(10+x*bw,46+y*12,bw-2,10,cs[y%4]);rect(paddle,SCREEN_H-28,44,6,C_CYAN);rect((int)bx,(int)by,7,7,C_WHITE);if(over){border_rect(36,SCREEN_H/2-25,SCREEN_W-72,52,won?C_GREEN:C_RED);draw_text(70,SCREEN_H/2-10,won?"STAGE CLEAR":"GAME OVER",won?C_GREEN:C_RED,2);draw_text(62,SCREEN_H/2+12,won?"A NEXT LEVEL":"A RETRY",C_WHITE,1);}render_display();}
+bool breakout_is_over(){return over;}bool breakout_is_won(){return won;}int breakout_score(){return score;}
